@@ -8,7 +8,7 @@ function App() {
           Bem-vindo!
         </Heading>
         <Text fontSize="lg" color="brand.secondary">
-          Esta é uma página modelo, agora personalize da sua forma.
+          Rick and Morty API é uma API pública que fornece dados sobre os personagens, episódios e locais do universo de Rick and Morty.
         </Text>
       </Box>
     </Center>

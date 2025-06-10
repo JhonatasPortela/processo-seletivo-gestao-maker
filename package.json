@@ -1,6 +1,6 @@
 {
-  "name": "react-vite-chakra-modelo",
-  "private": true,
+  "name": "processo-seletivo-gestao-maker",
+  "private": false,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
