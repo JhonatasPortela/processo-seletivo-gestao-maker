@@ -5,7 +5,8 @@
   scrollbar-width: thin;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   font-family: inherit;
   background: inherit;
@@ -17,11 +18,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-img, picture, video, canvas, svg {
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
 }
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   font: inherit;
 }
