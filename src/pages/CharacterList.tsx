@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { getAllCharacters } from '../services/api'
 import { Character } from '../typings/character'
-import { Box, Text, Spinner, Center, VStack, Flex } from '@chakra-ui/react'
+import { Box, Text, Spinner, Center, Flex } from '@chakra-ui/react'
+import CharacterCard from '../components/CharacterCard'
 
 const CharacterList = () => {
   const [characters, setCharacters] = useState<Character[]>([])
@@ -56,7 +57,7 @@ const CharacterList = () => {
         p={5}
         bg="rgba(0, 0, 0, 0.7)"
         borderRadius="lg"
-        maxWidth="800px"
+        maxWidth="1000px"
         width="100%"
         color="green.400"
         textAlign="center"
@@ -64,24 +65,8 @@ const CharacterList = () => {
         <Text fontSize="3xl" fontWeight="bold" mb={4} color="green.400">
           Todos os Personagens de Rick e Morty:
         </Text>
-        <VStack spacing={3} align="stretch">
-          {characters.length > 0 ? (
-            characters.map((character) => (
-              <Box
-                key={character.id}
-                p={2}
-                borderWidth="1px"
-                borderRadius="md"
-                bg="gray.700"
-                borderColor="gray.600"
-              >
-                <Text fontSize="lg">{character.name}</Text>
-              </Box>
-            ))
-          ) : (
-            <Text fontSize="lg">Nenhum personagem encontrado.</Text>
-          )}
-        </VStack>
+
+        <CharacterCard characters={characters} />
       </Box>
     </Flex>
   )
