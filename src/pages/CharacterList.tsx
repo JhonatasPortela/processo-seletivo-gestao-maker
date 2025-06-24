@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { getAllCharacters } from '../services/api'
 import { Character } from '../typings/character'
-import { Box, Text, Spinner, Center, Flex } from '@chakra-ui/react'
+import { Box, Text, Image, Center } from '@chakra-ui/react'
 import CharacterCard from '../components/CharacterCard'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import Background from '../components/Background'
 
 const CharacterList = () => {
   const [characters, setCharacters] = useState<Character[]>([])
@@ -28,47 +31,44 @@ const CharacterList = () => {
 
   if (loading) {
     return (
-      <Center height="100vh">
-        <Spinner size="xl" color="green.500" />
-      </Center>
+      <Background>
+        <Image src={'src/assets/img/portal-rick-and-morty.gif'} />
+      </Background>
     )
   }
 
   if (error) {
     return (
-      <Center height="100vh">
+      <Background>
         <Text fontSize="xl" color="red.500">
           {error}
         </Text>
-      </Center>
+      </Background>
     )
   }
 
   return (
-    <Flex
-      bgImage="src/assets/img/HuGGeENt6kGyixe3hT9tnY-650-80.jpg.webp"
-      bgPosition="center"
-      minH="100vh"
-      direction="column"
-      align="center"
-      justify="center"
-    >
-      <Box
-        p={5}
-        bg="rgba(0, 0, 0, 0.7)"
-        borderRadius="lg"
-        maxWidth="1000px"
-        width="100%"
-        color="green.400"
-        textAlign="center"
-      >
-        <Text fontSize="3xl" fontWeight="bold" mb={4} color="green.400">
-          Todos os Personagens de Rick e Morty:
-        </Text>
+    <Background>
+      <Navbar />
+      <Center flex="1" pt="80px" pb="80px" px={4} flexDirection="column">
+        <Box
+          p={5}
+          bg="rgba(0, 0, 0, 0.7)"
+          borderRadius="lg"
+          maxWidth="1000px"
+          width="100%"
+          color="green.400"
+          textAlign="center"
+        >
+          <Text fontSize="3xl" fontWeight="bold" mb={4} color="green.400">
+            Rick and Morty Wiki
+          </Text>
 
-        <CharacterCard characters={characters} />
-      </Box>
-    </Flex>
+          <CharacterCard characters={characters} />
+        </Box>
+      </Center>
+      <Footer />
+    </Background>
   )
 }
 
