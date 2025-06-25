@@ -30,7 +30,13 @@ const CharacterCard = ({ characters }) => {
             <Text fontSize="lg" fontWeight="500">
               {character.name}
             </Text>
-            <Button size="sm" marginTop={3}>
+            <Button
+              size="sm"
+              marginTop={3}
+              color="white"
+              bg="gray.600"
+              _hover={{ bg: 'gray.500' }}
+            >
               <Icon as={FaSearch} mr={2} />
               Ver detalhes
             </Button>

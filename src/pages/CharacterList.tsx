@@ -1,26 +1,31 @@
 import { useEffect, useState } from 'react'
 import { getAllCharacters } from '../services/api'
 import { Character } from '../typings/character'
-import { Box, Text, Image, Center } from '@chakra-ui/react'
+import { Box, Text, Image, Center, VStack, Input } from '@chakra-ui/react'
 import CharacterCard from '../components/CharacterCard'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import Background from '../components/Background'
 
 const CharacterList = () => {
-  const [characters, setCharacters] = useState<Character[]>([])
+  const [allCharacters, setAllCharacters] = useState<Character[]>([])
+  const [displayedCharacters, setDisplayedCharacters] = useState<Character[]>(
+    []
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     const fetchAllCharacters = async () => {
       setLoading(true)
       setError(null)
       try {
-        const allData = await getAllCharacters()
-        setCharacters(allData)
+        const data = await getAllCharacters()
+        setAllCharacters(data)
+        setDisplayedCharacters(data)
       } catch (erro) {
-        console.error('Falha ao buscar todos os personagens:', erro)
+        console.error('Falha ao buscar os personagens:', erro)
       } finally {
         setLoading(false)
       }
@@ -28,6 +33,13 @@ const CharacterList = () => {
 
     fetchAllCharacters()
   }, [])
+
+  useEffect(() => {
+    const filteredCharacters = allCharacters.filter((character) =>
+      character.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    setDisplayedCharacters(filteredCharacters)
+  }, [searchTerm, allCharacters])
 
   if (loading) {
     return (
@@ -63,8 +75,28 @@ const CharacterList = () => {
           <Text fontSize="3xl" fontWeight="bold" mb={4} color="green.400">
             Rick and Morty Wiki
           </Text>
+          <VStack spacing={4} mb={8}>
+            <Input
+              placeholder="Buscar personagem..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              size="lg"
+              maxWidth="500px"
+              alignSelf="center"
+              borderColor="green.500"
+              focusBorderColor="green.300"
+              _placeholder={{ color: 'gray.500' }}
+              color="whiteAlpha.900"
+            />
+          </VStack>
 
-          <CharacterCard characters={characters} />
+          {displayedCharacters.length > 0 ? (
+            <CharacterCard characters={displayedCharacters} />
+          ) : (
+            <Text fontSize="lg" color="gray.500">
+              Nenhum personagem encontrado para "{searchTerm}".
+            </Text>
+          )}
         </Box>
       </Center>
       <Footer />
