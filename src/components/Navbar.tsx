@@ -1,6 +1,8 @@
 import { Flex, Image, Link as ChakraLink } from '@chakra-ui/react'
 import { Link as ReactRouterLink } from 'react-router-dom'
 
+import logo from '../assets/img/portal-rick-and-morty.gif'
+
 const Navbar = () => {
   return (
     <Flex
@@ -21,12 +23,7 @@ const Navbar = () => {
       boxShadow="md"
     >
       <ChakraLink as={ReactRouterLink} to="/" mr={3}>
-        <Image
-          src={'src/assets/img/portal-rick-and-morty.gif'}
-          alt="Portal"
-          boxSize="50px"
-          objectFit="contain"
-        />
+        <Image src={logo} alt="Portal" boxSize="50px" objectFit="contain" />
       </ChakraLink>
 
       <ChakraLink

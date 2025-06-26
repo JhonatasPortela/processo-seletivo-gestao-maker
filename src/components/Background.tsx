@@ -1,9 +1,10 @@
 import { Flex } from '@chakra-ui/react'
+import imgBackground from '../assets/img/HuGGeENt6kGyixe3hT9tnY-650-80.jpg.webp'
 
 const Background = ({ children }) => {
   return (
     <Flex
-      bgImage="src/assets/img/HuGGeENt6kGyixe3hT9tnY-650-80.jpg.webp"
+      bgImage={imgBackground}
       bgSize="auto"
       bgPosition="center"
       minH="100vh"
