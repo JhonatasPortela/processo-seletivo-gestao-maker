@@ -84,12 +84,21 @@ const CharacterDetail = () => {
     <Background>
       <Navbar />
       <Center flex="1" flexDirection="column" pt="80px" pb="80px">
-        {loading && <Image src={imgLoading} />}
+        {loading && (
+          <Image
+            src={imgLoading}
+            alt="Carregando Portal"
+            boxSize="150px"
+            objectFit="contain"
+          />
+        )}
+
         {error && (
           <Text fontSize="xl" color="red.500" mb={4}>
             {error}
           </Text>
         )}
+
         {!loading && !character && !error && (
           <Text fontSize="xl" color="red.500" mb={4}>
             {message || 'Personagem não encontrado.'}
@@ -109,11 +118,9 @@ const CharacterDetail = () => {
   if (loading) {
     return renderLoadingOrError()
   }
-
   if (error) {
     return renderLoadingOrError(error)
   }
-
   if (!character) {
     return renderLoadingOrError('Personagem não encontrado.')
   }

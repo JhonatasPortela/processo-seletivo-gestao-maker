@@ -2,6 +2,7 @@ import { Box, Heading, Text, Center, Image } from '@chakra-ui/react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import Background from '../components/Background'
+import imgHomeGif from '../assets/img/icegif-519.gif'
 
 const HomePage = () => {
   return (
@@ -9,7 +10,7 @@ const HomePage = () => {
       <Navbar />
 
       <Center flex="1" pt="80px" pb="80px" px={4} flexDirection="column">
-        <Image src={'src/assets/img/icegif-519.gif'}></Image>
+        <Image src={imgHomeGif} />
         <Box
           p={8}
           bg="rgba(0, 0, 0, 0.75)"

@@ -3,19 +3,25 @@ import { ApiResponse, Character } from '../typings/character'
 
 const API_URL = 'https://rickandmortyapi.com/api'
 
-export const getAllCharacters = async (): Promise<Character[]> => {
-  let allCharacters: Character[] = []
-  let nextUrl: string | null = `${API_URL}/character`
-
+export const getCharacters = async (
+  page: number = 1,
+  nameSearch: string = ''
+): Promise<ApiResponse> => {
   try {
-    while (nextUrl) {
-      const response = await axios.get<ApiResponse>(nextUrl)
-      allCharacters = allCharacters.concat(response.data.results)
-      nextUrl = response.data.info.next
+    const config = {
+      params: {
+        page: page,
+        name: nameSearch,
+      },
     }
-    return allCharacters
+
+    const response = await axios.get<ApiResponse>(
+      `${API_URL}/character`,
+      config
+    )
+    return response.data
   } catch (error) {
-    console.error('Erro ao buscar todos os personagens:', error)
+    console.error('Erro ao buscar personagens:', error)
     throw error
   }
 }
