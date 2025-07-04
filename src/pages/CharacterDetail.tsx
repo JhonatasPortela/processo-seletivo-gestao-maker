@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getCharacterById } from '../services/api'
-import { Character } from '../typings/character'
+import { getCharacterById, getEpisodeById } from '../services/api'
+import { Character, Episode } from '../typings/character'
 import {
   Box,
   Text,
@@ -11,6 +11,7 @@ import {
   Badge,
   Button,
   Icon,
+  Spinner,
 } from '@chakra-ui/react'
 import { FaArrowLeft } from 'react-icons/fa'
 import Navbar from '../components/Navbar'
@@ -48,6 +49,15 @@ const translateGender = (
   }
 }
 
+const formatDate = (dateString: string): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }
+  return new Date(dateString).toLocaleDateString('pt-BR', options)
+}
+
 const CharacterDetail = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -55,6 +65,9 @@ const CharacterDetail = () => {
   const [character, setCharacter] = useState<Character | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [episodes, setEpisodes] = useState<Episode[]>([])
+  const [loadingEpisodes, setLoadingEpisodes] = useState(true)
+  const [episodesError, setEpisodesError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchCharacterDetails = async () => {
@@ -79,6 +92,43 @@ const CharacterDetail = () => {
 
     fetchCharacterDetails()
   }, [id])
+
+  useEffect(() => {
+    const fetchEpisodeDetails = async () => {
+      if (character && character.episode && character.episode.length > 0) {
+        setLoadingEpisodes(true)
+        setEpisodesError(null)
+        try {
+          const episodeIds = character.episode
+            .map((url) => {
+              const match = url.match(/\/(\d+)$/)
+              return match ? parseInt(match[1]) : null
+            })
+            .filter((id) => id !== null) as number[]
+
+          const fetchedEpisodes = await Promise.all(
+            episodeIds.map((episodeId) => getEpisodeById(episodeId))
+          )
+          setEpisodes(fetchedEpisodes)
+        } catch (err) {
+          console.error('Erro ao buscar detalhes dos episódios:', err)
+          setEpisodesError(
+            'Não foi possível carregar os detalhes dos episódios.'
+          )
+          setEpisodes([])
+        } finally {
+          setLoadingEpisodes(false)
+        }
+      } else if (character) {
+        setLoadingEpisodes(false)
+        setEpisodes([])
+      }
+    }
+
+    if (character && character.episode) {
+      fetchEpisodeDetails()
+    }
+  }, [character])
 
   const renderLoadingOrError = (message?: string) => (
     <Background>
@@ -133,8 +183,8 @@ const CharacterDetail = () => {
           p={8}
           bg="rgba(0, 0, 0, 0.8)"
           borderRadius="lg"
-          maxWidth="600px"
-          width="150%"
+          maxWidth={{ base: '100%', sm: '450px', md: '550px', lg: '650px' }}
+          width="100%"
           color="whiteAlpha.900"
           textAlign="center"
           boxShadow="dark-lg"
@@ -165,7 +215,13 @@ const CharacterDetail = () => {
             {character.name}
           </Text>
 
-          <VStack spacing={3} align="flex-start" mx="auto" maxWidth="300px">
+          <VStack
+            spacing={3}
+            align="flex-start"
+            mx="auto"
+            maxWidth="unset"
+            w="100%"
+          >
             <Text fontSize="lg">
               <Text as="span" fontWeight="bold">
                 Status:
@@ -207,18 +263,30 @@ const CharacterDetail = () => {
               {translateGender(character.gender)}
             </Text>
 
-            <Text fontSize="lg">
-              <Text as="span" fontWeight="bold">
+            <Text
+              fontSize="lg"
+              display="flex"
+              flexDirection="row"
+              textAlign="left"
+              w="100%"
+            >
+              <Text as="span" fontWeight="bold" mr={1} whiteSpace="nowrap">
                 Origem:
               </Text>{' '}
-              {character.origin.name}
+              <Text as="span">{character.origin.name}</Text>
             </Text>
 
-            <Text fontSize="lg">
-              <Text as="span" fontWeight="bold">
+            <Text
+              fontSize="lg"
+              display="flex"
+              flexDirection="row"
+              textAlign="left"
+              w="100%"
+            >
+              <Text as="span" fontWeight="bold" mr={1} whiteSpace="nowrap">
                 Última Localização:
               </Text>{' '}
-              {character.location.name}
+              <Text as="span">{character.location.name}</Text>
             </Text>
 
             <Text
@@ -227,22 +295,52 @@ const CharacterDetail = () => {
               mt={6}
               mb={2}
               color="green.300"
+              textAlign="left"
+              w="100%"
             >
-              Apareceu em:
+              Apareceu em {character.episode.length} episódios:
             </Text>
-            <VStack spacing={1} align="flex-start">
-              {character.episode.map((episodeUrl) => {
-                const episodeNumberMatch = episodeUrl.match(/\/(\d+)$/)
-                const episodeNumber = episodeNumberMatch
-                  ? episodeNumberMatch[1]
-                  : 'N/A'
-                return (
-                  <Text key={episodeUrl} fontSize="md" color="gray.300">
-                    Episódio {episodeNumber}
-                  </Text>
-                )
-              })}
-            </VStack>
+
+            {loadingEpisodes ? (
+              <Center w="100%">
+                <Spinner size="sm" color="green.300" />
+              </Center>
+            ) : episodesError ? (
+              <Text fontSize="md" color="red.400">
+                {episodesError}
+              </Text>
+            ) : episodes.length > 0 ? (
+              <VStack spacing={1} align="flex-start" w="100%">
+                {episodes.map((episode) => (
+                  <Box
+                    key={episode.id}
+                    py={1}
+                    px={2}
+                    borderRadius="md"
+                    _hover={{ bg: 'gray.600' }}
+                    w="100%"
+                    borderBottom={'solid'}
+                    borderColor={'green.400'}
+                    textAlign="left"
+                  >
+                    <Text
+                      fontSize="md"
+                      color="whiteAlpha.800"
+                      fontWeight="semibold"
+                    >
+                      {episode.name}
+                    </Text>
+                    <Text fontSize="sm" color="gray.400">
+                      {episode.episode} - {formatDate(episode.air_date)}
+                    </Text>
+                  </Box>
+                ))}
+              </VStack>
+            ) : (
+              <Text fontSize="md" color="gray.400">
+                Nenhum episódio encontrado para este personagem.
+              </Text>
+            )}
           </VStack>
         </Box>
       </Center>

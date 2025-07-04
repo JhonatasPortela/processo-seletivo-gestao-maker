@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ApiResponse, Character } from '../typings/character'
+import { ApiResponse, Character, Episode } from '../typings/character'
 
 const API_URL = 'https://rickandmortyapi.com/api'
 
@@ -45,6 +45,16 @@ export const getCharacterById = async (id: number): Promise<Character> => {
     return response.data
   } catch (error) {
     console.error(`Erro ao buscar personagem com ID ${id}:`, error)
+    throw error
+  }
+}
+
+export const getEpisodeById = async (id: number): Promise<Episode> => {
+  try {
+    const response = await axios.get<Episode>(`${API_URL}/episode/${id}`)
+    return response.data
+  } catch (error) {
+    console.error(`Erro ao buscar episódio com ID ${id}:`, error)
     throw error
   }
 }
