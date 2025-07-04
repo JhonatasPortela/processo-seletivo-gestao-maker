@@ -85,6 +85,10 @@ const CharacterList = () => {
     }
   }, [currentPage, searchTerm, fetchCharacters])
 
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
+
   if (loading && characters.length === 0) {
     return (
       <Background>
