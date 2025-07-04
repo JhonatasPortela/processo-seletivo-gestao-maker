@@ -14,13 +14,26 @@ export const getCharacters = async (
         name: nameSearch,
       },
     }
-
     const response = await axios.get<ApiResponse>(
       `${API_URL}/character`,
       config
     )
     return response.data
   } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response && error.response.status === 404) {
+        console.warn('Nenhum personagem encontrado para a busca:', nameSearch)
+        return {
+          info: {
+            count: 0,
+            pages: 0,
+            next: null,
+            prev: null,
+          },
+          results: [],
+        } as ApiResponse
+      }
+    }
     console.error('Erro ao buscar personagens:', error)
     throw error
   }
