@@ -32,7 +32,7 @@ const CharacterCard = ({ characters }: CharacterCardProps) => {
             mx="auto"
             mb={4}
           />
-          <Text fontSize="lg" fontWeight="500">
+          <Text fontSize="lg" fontWeight="500" color={'green.400'}>
             {character.name}
           </Text>
           <Button
