@@ -1,6 +1,3 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { getCharacters } from '../services/api'
-import { Character } from '../typings/character'
 import {
   Box,
   Text,
@@ -16,120 +13,30 @@ import {
   HStack,
 } from '@chakra-ui/react'
 import { SearchIcon, CloseIcon } from '@chakra-ui/icons'
-
 import CharacterCard from '../components/CharacterCard'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import Background from '../components/Background'
 import imgLoading from '../assets/img/portal-rick-and-morty.gif'
+import { useCharactersList } from '../hooks/useCharacterList'
 
 const CharacterList = () => {
-  const [characters, setCharacters] = useState<Character[]>([])
-  const [isLoadingInitial, setIsLoadingInitial] = useState(true)
-  const [isLoadingMore, setIsLoadingMore] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [currentSearchTerm, setCurrentSearchTerm] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
-  const observerTarget = useRef(null)
-  const observer = useRef<IntersectionObserver | null>(null)
+  const {
+    characters,
+    isLoadingInitial,
+    isLoadingMore,
+    error,
+    searchTerm,
+    setSearchTerm,
+    currentSearchTerm,
+    hasMore,
+    observerTarget,
+    handleSearchClick,
+    handleKeyPress,
+    handleClearInput,
+  } = useCharactersList()
 
-  const fetchCharacters = useCallback(async (page: number, term: string) => {
-    if (page === 1) {
-      setIsLoadingInitial(true)
-    } else {
-      setIsLoadingMore(true)
-    }
-    setError(null)
-
-    try {
-      const data = await getCharacters(page, term)
-      setCharacters((prevCharacters) =>
-        page === 1 ? data.results : [...prevCharacters, ...data.results]
-      )
-      setHasMore(data.info.next !== null)
-    } catch (erro) {
-      console.error('Falha ao buscar personagens:', erro)
-      setError(
-        'Erro ao carregar personagens. Verifique sua conexão ou tente novamente mais tarde.'
-      )
-      setHasMore(false)
-      setCharacters([])
-    } finally {
-      setIsLoadingInitial(false)
-      setIsLoadingMore(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    setCurrentPage(1)
-    setCharacters([])
-    setHasMore(true)
-    setError(null)
-    fetchCharacters(1, currentSearchTerm)
-  }, [currentSearchTerm, fetchCharacters])
-
-  useEffect(() => {
-    if (observer.current) {
-      observer.current.disconnect()
-    }
-
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        const target =
-          entries && entries.length > 0
-            ? entries.find((entry) => entry.isIntersecting)
-            : null
-        if (
-          target &&
-          !isLoadingInitial &&
-          !isLoadingMore &&
-          hasMore &&
-          characters.length > 0
-        ) {
-          setCurrentPage((prevPage) => prevPage + 1)
-        }
-      },
-      {
-        root: null,
-        rootMargin: '200px',
-        threshold: 0.1,
-      }
-    )
-
-    if (observerTarget.current) {
-      observer.current.observe(observerTarget.current)
-    }
-
-    return () => {
-      if (observer.current) {
-        observer.current.disconnect()
-      }
-    }
-  }, [isLoadingInitial, isLoadingMore, hasMore, characters.length])
-
-  useEffect(() => {
-    if (currentPage > 1) {
-      fetchCharacters(currentPage, currentSearchTerm)
-    }
-  }, [currentPage, currentSearchTerm, fetchCharacters])
-
-  const handleSearchClick = () => {
-    setCurrentSearchTerm(searchTerm)
-  }
-
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      handleSearchClick()
-    }
-  }
-
-  const handleClearInput = () => {
-    setSearchTerm('')
-    setCurrentSearchTerm('')
-  }
-
+  // Renderização Condicional para o estado de carregamento inicial.
   if (isLoadingInitial && characters.length === 0 && currentSearchTerm === '') {
     return (
       <Background>
@@ -148,6 +55,7 @@ const CharacterList = () => {
     )
   }
 
+  // Renderização principal do componente quando não está no estado de carregamento inicial.
   return (
     <Background>
       <Navbar />
@@ -158,12 +66,13 @@ const CharacterList = () => {
           borderRadius="lg"
           maxWidth="1000px"
           width="100%"
-          color="green.400"
           textAlign="center"
         >
           <Text fontSize="3xl" fontWeight="bold" mb={4} color="green.400">
             Rick and Morty Wiki
           </Text>
+
+          {/* Seção de busca */}
           <VStack spacing={4} mb={8}>
             <HStack maxWidth="500px" width="100%">
               <InputGroup flex="1">
@@ -179,6 +88,7 @@ const CharacterList = () => {
                   color="whiteAlpha.900"
                   borderRightRadius={searchTerm ? 'none' : 'md'}
                 />
+                {/* Botão de limpar, visível apenas se houver algo digitado. */}
                 {searchTerm && (
                   <InputRightElement width="3rem">
                     <IconButton
@@ -195,6 +105,7 @@ const CharacterList = () => {
                 )}
               </InputGroup>
 
+              {/* Botão de busca. */}
               <IconButton
                 h="3rem"
                 width="3rem"
@@ -209,8 +120,12 @@ const CharacterList = () => {
                 _hover={{ bg: 'green.600', transform: 'scale(1.05)' }}
               />
             </HStack>
+            <Text fontSize="sm" color="gray.400">
+              Pressione "Enter" ou clique no ícone de busca para pesquisar.
+            </Text>
           </VStack>
 
+          {/* Renderização Condicional da Lista de Personagens / Mensagens */}
           {characters.length > 0 ? (
             <CharacterCard characters={characters} />
           ) : (
@@ -224,18 +139,21 @@ const CharacterList = () => {
             )
           )}
 
+          {/* Exibe um spinner se estiver carregando mais personagens (scroll infinito). */}
           {isLoadingMore && (
             <Center mt={4}>
               <Spinner size="md" color="green.500" />
             </Center>
           )}
 
+          {/* Exibe uma mensagem de erro se houver um erro. */}
           {error && (
             <Text fontSize="lg" color="red.500" mt={4}>
               {error}
             </Text>
           )}
 
+          {/* Elemento de Gatilho para o Scroll Infinito: */}
           {hasMore &&
             characters.length > 0 &&
             !isLoadingInitial &&
@@ -243,6 +161,7 @@ const CharacterList = () => {
               <Box ref={observerTarget} height="20px" mt={4}></Box>
             )}
 
+          {/* Mensagem de Fim da Lista: */}
           {!hasMore &&
             characters.length > 0 &&
             !isLoadingInitial &&
