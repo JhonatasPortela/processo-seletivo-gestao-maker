@@ -14,11 +14,10 @@ import {
 } from '@chakra-ui/react'
 import { SearchIcon, CloseIcon } from '@chakra-ui/icons'
 import CharacterCard from '../components/CharacterCard'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 import Background from '../components/Background'
 import imgLoading from '../assets/img/portal-rick-and-morty.gif'
-import { useCharactersList } from '../hooks/useCharacterList'
+import { useCharactersList } from '../hooks/useCharactersList'
+import { useDynamicColors } from '../hooks/useDynamicColors'
 
 const CharacterList = () => {
   const {
@@ -35,6 +34,7 @@ const CharacterList = () => {
     handleKeyPress,
     handleClearInput,
   } = useCharactersList()
+  const colors = useDynamicColors()
 
   // Renderização Condicional para o estado de carregamento inicial.
   if (isLoadingInitial && characters.length === 0 && currentSearchTerm === '') {
@@ -58,17 +58,16 @@ const CharacterList = () => {
   // Renderização principal do componente quando não está no estado de carregamento inicial.
   return (
     <Background>
-      <Navbar />
       <Center flex="1" pt="80px" pb="80px" px={4} flexDirection="column">
         <Box
           p={5}
-          bg="rgba(0, 0, 0, 0.7)"
+          bg={colors.boxBg}
           borderRadius="lg"
           maxWidth="1000px"
           width="100%"
           textAlign="center"
         >
-          <Text fontSize="3xl" fontWeight="bold" mb={4} color="green.400">
+          <Text fontSize="3xl" fontWeight="bold" mb={4} color={colors.green}>
             Rick and Morty Wiki
           </Text>
 
@@ -82,11 +81,10 @@ const CharacterList = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={handleKeyPress}
                   size="lg"
-                  borderColor="green.500"
-                  focusBorderColor="green.300"
+                  borderColor={colors.green}
+                  focusBorderColor={colors.green}
                   _placeholder={{ color: 'gray.500' }}
-                  color="whiteAlpha.900"
-                  borderRightRadius={searchTerm ? 'none' : 'md'}
+                  color={colors.green}
                 />
                 {/* Botão de limpar, visível apenas se houver algo digitado. */}
                 {searchTerm && (
@@ -98,7 +96,7 @@ const CharacterList = () => {
                       aria-label="Limpar busca"
                       onClick={handleClearInput}
                       variant="ghost"
-                      color="gray.400"
+                      color={colors.green}
                       _hover={{ bg: 'transparent', color: 'red.400' }}
                     />
                   </InputRightElement>
@@ -113,14 +111,14 @@ const CharacterList = () => {
                 icon={<SearchIcon />}
                 onClick={handleSearchClick}
                 aria-label="Buscar personagem"
-                bg="green.400"
+                bg={colors.green}
                 color="white"
                 borderRadius="md"
                 ml={2}
                 _hover={{ bg: 'green.600', transform: 'scale(1.05)' }}
               />
             </HStack>
-            <Text fontSize="sm" color="gray.400">
+            <Text fontSize="sm" color={colors.green}>
               Pressione "Enter" ou clique no ícone de busca para pesquisar.
             </Text>
           </VStack>
@@ -166,13 +164,12 @@ const CharacterList = () => {
             characters.length > 0 &&
             !isLoadingInitial &&
             !isLoadingMore && (
-              <Text fontSize="md" color="gray.500" mt={4}>
+              <Text fontSize="md" color={colors.text} mt={4}>
                 Você chegou ao fim da lista de personagens!
               </Text>
             )}
         </Box>
       </Center>
-      <Footer />
     </Background>
   )
 }

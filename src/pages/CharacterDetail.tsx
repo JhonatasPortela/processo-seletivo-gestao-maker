@@ -21,9 +21,11 @@ import {
   translateGender,
   translateStatus,
 } from '../utils/translations'
+import { useDynamicColors } from '../hooks/useDynamicColors'
 
 const CharacterDetail = () => {
   const navigate = useNavigate()
+  const colors = useDynamicColors()
   const {
     character,
     loading,
@@ -35,7 +37,6 @@ const CharacterDetail = () => {
 
   const renderLoadingOrError = (message?: string) => (
     <Background>
-      <Navbar />
       <Center flex="1" flexDirection="column" pt="80px" pb="80px">
         {loading && (
           <Image
@@ -59,7 +60,7 @@ const CharacterDetail = () => {
         )}
 
         {!loading && (error || !character) && (
-          <Button onClick={() => navigate('/characters')} colorScheme="green">
+          <Button onClick={() => navigate('/characters')} colorScheme={'green'}>
             Voltar para a lista
           </Button>
         )}
@@ -84,17 +85,17 @@ const CharacterDetail = () => {
       <Center flex="1" pt="80px" pb="80px" px={4} flexDirection="column">
         <Box
           p={8}
-          bg="rgba(0, 0, 0, 0.8)"
+          bg={colors.boxBg}
           borderRadius="lg"
           maxWidth={{ base: '100%', sm: '450px', md: '550px', lg: '650px' }}
           width="100%"
-          color="whiteAlpha.900"
+          color={colors.text}
           textAlign="center"
           boxShadow="dark-lg"
         >
           <Button
             onClick={() => navigate('/characters')}
-            colorScheme="green"
+            colorScheme={'green'}
             size="sm"
             leftIcon={<Icon as={FaArrowLeft} />}
             mb={4}
@@ -111,10 +112,10 @@ const CharacterDetail = () => {
             mx="auto"
             mb={6}
             border="4px solid"
-            borderColor="green.400"
+            borderColor={colors.green}
           />
 
-          <Text fontSize="4xl" fontWeight="bold" mb={4} color="green.400">
+          <Text fontSize="4xl" fontWeight="bold" mb={4} color={colors.green}>
             {character.name}
           </Text>
 
@@ -197,7 +198,7 @@ const CharacterDetail = () => {
               fontWeight="bold"
               mt={6}
               mb={2}
-              color="green.300"
+              color={colors.green}
               textAlign="left"
               w="100%"
             >
@@ -220,34 +221,33 @@ const CharacterDetail = () => {
                     py={1}
                     px={2}
                     borderRadius="md"
-                    _hover={{ bg: 'gray.600' }}
+                    _hover={{ bg: 'gray.500' }}
                     w="100%"
                     borderBottom={'solid'}
-                    borderColor={'green.400'}
+                    borderColor={colors.green}
                     textAlign="left"
                   >
                     <Text
                       fontSize="md"
-                      color="whiteAlpha.800"
+                      color={colors.text}
                       fontWeight="semibold"
                     >
                       {episode.name}
                     </Text>
-                    <Text fontSize="sm" color="gray.400">
+                    <Text fontSize="sm" color={colors.text}>
                       {episode.episode} - {formatDate(episode.air_date)}
                     </Text>
                   </Box>
                 ))}
               </VStack>
             ) : (
-              <Text fontSize="md" color="gray.400">
+              <Text fontSize="md" color={colors.text}>
                 Nenhum episódio encontrado para este personagem.
               </Text>
             )}
           </VStack>
         </Box>
       </Center>
-      <Footer />
     </Background>
   )
 }
